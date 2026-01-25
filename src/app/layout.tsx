@@ -1,0 +1,72 @@
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { Providers } from './providers';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import { CookieConsent } from '@/components/gdpr/cookie-consent';
+import './globals.css';
+
+const inter = Inter({ subsets: ['latin'] });
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://sized-furniture.com';
+
+export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: 'Sized Furniture - サイズで探す家具検索',
+    template: '%s | Sized Furniture',
+  },
+  description:
+    'サイズで家具を検索できるサイト。幅・奥行き・高さを指定して、ぴったりの家具を見つけましょう。Amazon、楽天など複数のECサイトから最適な家具を提案します。',
+  keywords: ['家具', 'サイズ', '検索', 'デスク', '椅子', '収納', 'ベッド', 'ソファ', 'インテリア'],
+  authors: [{ name: 'Sized Furniture' }],
+  creator: 'Sized Furniture',
+  openGraph: {
+    title: 'Sized Furniture - サイズで探す家具検索',
+    description: 'サイズで家具を検索できるサイト。ぴったりの家具を見つけましょう。',
+    type: 'website',
+    locale: 'ja_JP',
+    siteName: 'Sized Furniture',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Sized Furniture - サイズで探す家具検索',
+    description: 'サイズで家具を検索できるサイト',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    // Google Search Console の認証コード（実際の値に置き換え）
+    // google: 'your-google-verification-code',
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="ja">
+      <body className={inter.className}>
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </div>
+          <CookieConsent />
+        </Providers>
+      </body>
+    </html>
+  );
+}
