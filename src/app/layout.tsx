@@ -4,6 +4,7 @@ import { Providers } from './providers';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { CookieConsent } from '@/components/gdpr/cookie-consent';
+import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -58,6 +59,7 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={inter.className}>
+        <GoogleAnalytics />
         <Providers>
           <div className="flex min-h-screen flex-col">
             <Header />

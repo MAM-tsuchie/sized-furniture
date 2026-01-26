@@ -1,0 +1,65 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/batch/fetch-products?region=jp",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/batch/fetch-products?region=us",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/batch/fetch-products?region=uk",
+      "schedule": "0 5 * * *"
+    },
+    {
+      "path": "/api/batch/fetch-products?region=de",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/batch/fetch-products?region=fr",
+      "schedule": "0 7 * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/furniture",
+      "destination": "/categories",
+      "permanent": true
+    }
+  ],
+  "rewrites": []
+}

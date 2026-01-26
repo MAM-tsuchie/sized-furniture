@@ -1,0 +1,42 @@
+name: Product Fetch Cron
+
+on:
+  schedule:
+    # 毎日 AM 3:00 JST (UTC 18:00) に実行
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+    inputs:
+      region:
+        description: 'Region to fetch (jp, us, uk, de, fr, all)'
+        required: true
+        default: 'jp'
+        type: choice
+        options:
+          - jp
+          - us
+          - uk
+          - de
+          - fr
+          - all
+
+jobs:
+  fetch-products:
+    name: Fetch Products
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        region: ${{ github.event.inputs.region == 'all' && fromJson('["jp", "us", "uk", "de", "fr"]') || fromJson(format('["{0}"]', github.event.inputs.region || 'jp')) }}
+      max-parallel: 2
+      fail-fast: false
+
+    steps:
+      - name: Trigger Product Fetch
+        run: |
+          curl -X POST "${{ secrets.PRODUCTION_URL }}/api/batch/fetch-products" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -d '{"region": "${{ matrix.region }}"}'
+
+      - name: Log Result
+        run: |
+          echo "Product fetch triggered for region: ${{ matrix.region }}"
