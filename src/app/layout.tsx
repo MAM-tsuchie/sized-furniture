@@ -61,7 +61,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <GoogleAnalytics />
         <Providers>
-          <div className="flex min-h-screen flex-col">
+          <div className="flex min-h-screen flex-col bg-[#0c0c0c]">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />

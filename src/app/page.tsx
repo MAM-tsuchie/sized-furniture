@@ -1,22 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Ruler, Search, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { SizeInput } from '@/components/search/size-input';
+import { ArrowRight } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Select } from '@/components/ui/select';
 import { useTranslation } from '@/lib/i18n/context';
 import { useRegion } from '@/lib/region/context';
+import { woodColorGroups, solidColorGroups } from '@/lib/colors/data';
 
-// カテゴリデータ（仮）
-const FEATURED_CATEGORIES = [
-  { slug: 'desks', icon: '🖥️', nameJa: 'デスク', nameEn: 'Desks' },
-  { slug: 'dining-tables', icon: '🍽️', nameJa: 'ダイニングテーブル', nameEn: 'Dining Tables' },
-  { slug: 'office-chairs', icon: '🪑', nameJa: 'オフィスチェア', nameEn: 'Office Chairs' },
-  { slug: 'bookcases-shelves', icon: '📚', nameJa: '本棚・シェルフ', nameEn: 'Bookcases' },
-  { slug: 'tv-stands', icon: '📺', nameJa: 'テレビ台', nameEn: 'TV Stands' },
-  { slug: 'bed-frames', icon: '🛏️', nameJa: 'ベッド', nameEn: 'Beds' },
+// 使用する背景画像のリスト
+const BG_IMAGES = [2, 3, 4];
+
+// カテゴリデータ
+const CATEGORIES = [
+  { slug: 'desks', nameJa: 'デスク', nameEn: 'Desk' },
+  { slug: 'dining-tables', nameJa: 'ダイニングテーブル', nameEn: 'Dining Table' },
+  { slug: 'office-chairs', nameJa: 'オフィスチェア', nameEn: 'Office Chair' },
+  { slug: 'bookcases-shelves', nameJa: '本棚・シェルフ', nameEn: 'Bookcase' },
+  { slug: 'tv-stands', nameJa: 'テレビ台', nameEn: 'TV Stand' },
+  { slug: 'bed-frames', nameJa: 'ベッドフレーム', nameEn: 'Bed Frame' },
+  { slug: 'sofas', nameJa: 'ソファ', nameEn: 'Sofa' },
+  { slug: 'coffee-tables', nameJa: 'コーヒーテーブル', nameEn: 'Coffee Table' },
+  { slug: 'side-tables', nameJa: 'サイドテーブル', nameEn: 'Side Table' },
+  { slug: 'wardrobes', nameJa: 'ワードローブ', nameEn: 'Wardrobe' },
+  { slug: 'chest-drawers', nameJa: 'チェスト', nameEn: 'Chest of Drawers' },
+  { slug: 'shoe-racks', nameJa: 'シューズラック', nameEn: 'Shoe Rack' },
+];
+
+// カラーデータを統合
+const COLORS = [
+  { slug: '', nameJa: '指定なし', nameEn: 'Any color' },
+  ...woodColorGroups.map(c => ({ slug: c.slug, nameJa: c.name, nameEn: c.nameEn })),
+  ...solidColorGroups.map(c => ({ slug: c.slug, nameJa: c.name, nameEn: c.nameEn })),
 ];
 
 export default function HomePage() {
@@ -24,176 +40,214 @@ export default function HomePage() {
   const { t, language } = useTranslation();
   const { sizeUnit } = useRegion();
 
-  // クイック検索用のサイズ
-  const [widthMin, setWidthMin] = useState<number | undefined>();
-  const [widthMax, setWidthMax] = useState<number | undefined>();
-  const [depthMin, setDepthMin] = useState<number | undefined>();
-  const [depthMax, setDepthMax] = useState<number | undefined>();
-  const [heightMin, setHeightMin] = useState<number | undefined>();
-  const [heightMax, setHeightMax] = useState<number | undefined>();
+  const [widthMin, setWidthMin] = useState<string>('');
+  const [widthMax, setWidthMax] = useState<string>('');
+  const [depthMin, setDepthMin] = useState<string>('');
+  const [depthMax, setDepthMax] = useState<string>('');
+  const [heightMin, setHeightMin] = useState<string>('');
+  const [heightMax, setHeightMax] = useState<string>('');
+  const [color, setColor] = useState<string>('');
+  const [category, setCategory] = useState<string>('desks');
+  const [bgImage, setBgImage] = useState<number>(2);
 
-  const handleQuickSearch = () => {
+  // 背景画像をランダムで選択（初回のみ）
+  useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * BG_IMAGES.length);
+    setBgImage(BG_IMAGES[randomIndex]);
+  }, []);
+
+  const handleSearch = () => {
     const params = new URLSearchParams();
-    if (widthMin) params.set('widthMin', String(widthMin));
-    if (widthMax) params.set('widthMax', String(widthMax));
-    if (depthMin) params.set('depthMin', String(depthMin));
-    if (depthMax) params.set('depthMax', String(depthMax));
-    if (heightMin) params.set('heightMin', String(heightMin));
-    if (heightMax) params.set('heightMax', String(heightMax));
+    if (widthMin) params.set('widthMin', widthMin);
+    if (widthMax) params.set('widthMax', widthMax);
+    if (depthMin) params.set('depthMin', depthMin);
+    if (depthMax) params.set('depthMax', depthMax);
+    if (heightMin) params.set('heightMin', heightMin);
+    if (heightMax) params.set('heightMax', heightMax);
+    if (color) params.set('color', color);
+    params.set('category', category);
     
     router.push(`/search?${params.toString()}`);
   };
 
-  const handleCategoryClick = (slug: string) => {
-    router.push(`/category/${slug}`);
+  const unitLabel = sizeUnit === 'cm' ? 'cm' : 'in';
+  const isJa = language === 'ja';
+
+  // 多言語キャッチコピー
+  const headlines: Record<string, { line1: string; line2: string }> = {
+    ja: { line1: '置きたい場所にピッタリの', line2: '家具を検索' },
+    en: { line1: 'Find furniture that fits', line2: 'your space perfectly' },
+    de: { line1: 'Finden Sie Möbel, die perfekt', line2: 'in Ihren Raum passen' },
+    fr: { line1: 'Trouvez le meuble parfait', line2: 'pour votre espace' },
   };
+  const headline = headlines[language] || headlines.en;
 
   return (
-    <div className="flex flex-col">
-      {/* ヒーローセクション */}
-      <section className="bg-gradient-to-br from-blue-50 to-indigo-100 py-16 md:py-24">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 bg-blue-600 rounded-2xl">
-                <Ruler className="h-12 w-12 text-white" />
-              </div>
+    <div className="min-h-screen bg-[#0c0c0c] relative">
+      {/* 背景画像 */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+        style={{ backgroundImage: `url(/bg/${bgImage}.png)` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0c0c0c]/60 via-[#0c0c0c]/40 to-[#0c0c0c]" />
+      
+      {/* メイン検索セクション */}
+      <section className="py-16 md:py-24 relative z-10">
+        <div className="container mx-auto px-6">
+          <div className="max-w-xl mx-auto">
+            
+            {/* タイトル */}
+            <div className="text-center mb-12">
+              <h1 className="text-2xl md:text-3xl font-light text-white tracking-wide leading-relaxed">
+                {headline.line1}
+                <br />
+                <span className="text-[#c9a962]">{headline.line2}</span>
+              </h1>
+              <div className="w-12 h-px bg-[#c9a962] mx-auto mt-6" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-              {t.search.title}
-            </h1>
-            <p className="text-lg md:text-xl text-slate-600 mb-8">
-              {t.search.subtitle}
-            </p>
 
-            {/* クイックサイズ検索 */}
-            <Card className="max-w-3xl mx-auto">
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <SizeInput
-                    label={t.search.width}
-                    minValue={widthMin}
-                    maxValue={widthMax}
-                    onMinChange={setWidthMin}
-                    onMaxChange={setWidthMax}
-                    unit={sizeUnit}
-                    minPlaceholder={t.search.min}
-                    maxPlaceholder={t.search.max}
-                  />
-                  <SizeInput
-                    label={t.search.depth}
-                    minValue={depthMin}
-                    maxValue={depthMax}
-                    onMinChange={setDepthMin}
-                    onMaxChange={setDepthMax}
-                    unit={sizeUnit}
-                    minPlaceholder={t.search.min}
-                    maxPlaceholder={t.search.max}
-                  />
-                  <SizeInput
-                    label={t.search.height}
-                    minValue={heightMin}
-                    maxValue={heightMax}
-                    onMinChange={setHeightMin}
-                    onMaxChange={setHeightMax}
-                    unit={sizeUnit}
-                    minPlaceholder={t.search.min}
-                    maxPlaceholder={t.search.max}
-                  />
+            {/* 検索フォーム */}
+            <div className="bg-[#141414] border border-neutral-800 p-8 md:p-10 space-y-8">
+              
+              {/* サイズ入力グループ */}
+              <div className="space-y-6">
+                {/* 幅 */}
+                <div className="flex items-center gap-4">
+                  <span className="text-neutral-400 text-sm tracking-widest uppercase w-20">
+                    {t.search.width}
+                  </span>
+                  <div className="flex items-center gap-3 flex-1">
+                    <Input
+                      type="number"
+                      value={widthMin}
+                      onChange={(e) => setWidthMin(e.target.value)}
+                      placeholder="—"
+                      className="w-20 text-center bg-transparent border-neutral-700 text-white placeholder:text-neutral-600 focus:border-[#c9a962]"
+                    />
+                    <span className="text-neutral-600">–</span>
+                    <Input
+                      type="number"
+                      value={widthMax}
+                      onChange={(e) => setWidthMax(e.target.value)}
+                      placeholder="—"
+                      className="w-20 text-center bg-transparent border-neutral-700 text-white placeholder:text-neutral-600 focus:border-[#c9a962]"
+                    />
+                    <span className="text-neutral-500 text-sm">{unitLabel}</span>
+                  </div>
                 </div>
-                <Button
-                  onClick={handleQuickSearch}
-                  variant="primary"
-                  size="lg"
-                  className="w-full md:w-auto"
-                >
-                  <Search className="w-5 h-5 mr-2" />
-                  {t.search.searchButton}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
 
-      {/* カテゴリセクション */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-900 mb-8">
-            {t.category.title}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {FEATURED_CATEGORIES.map((category) => (
-              <button
-                key={category.slug}
-                onClick={() => handleCategoryClick(category.slug)}
-                className="flex flex-col items-center p-6 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
-              >
-                <span className="text-4xl mb-3">{category.icon}</span>
-                <span className="text-sm font-medium text-slate-700">
-                  {language === 'ja' ? category.nameJa : category.nameEn}
+                {/* 奥行き */}
+                <div className="flex items-center gap-4">
+                  <span className="text-neutral-400 text-sm tracking-widest uppercase w-20">
+                    {t.search.depth}
+                  </span>
+                  <div className="flex items-center gap-3 flex-1">
+                    <Input
+                      type="number"
+                      value={depthMin}
+                      onChange={(e) => setDepthMin(e.target.value)}
+                      placeholder="—"
+                      className="w-20 text-center bg-transparent border-neutral-700 text-white placeholder:text-neutral-600 focus:border-[#c9a962]"
+                    />
+                    <span className="text-neutral-600">–</span>
+                    <Input
+                      type="number"
+                      value={depthMax}
+                      onChange={(e) => setDepthMax(e.target.value)}
+                      placeholder="—"
+                      className="w-20 text-center bg-transparent border-neutral-700 text-white placeholder:text-neutral-600 focus:border-[#c9a962]"
+                    />
+                    <span className="text-neutral-500 text-sm">{unitLabel}</span>
+                  </div>
+                </div>
+
+                {/* 高さ */}
+                <div className="flex items-center gap-4">
+                  <span className="text-neutral-400 text-sm tracking-widest uppercase w-20">
+                    {t.search.height}
+                  </span>
+                  <div className="flex items-center gap-3 flex-1">
+                    <Input
+                      type="number"
+                      value={heightMin}
+                      onChange={(e) => setHeightMin(e.target.value)}
+                      placeholder="—"
+                      className="w-20 text-center bg-transparent border-neutral-700 text-white placeholder:text-neutral-600 focus:border-[#c9a962]"
+                    />
+                    <span className="text-neutral-600">–</span>
+                    <Input
+                      type="number"
+                      value={heightMax}
+                      onChange={(e) => setHeightMax(e.target.value)}
+                      placeholder="—"
+                      className="w-20 text-center bg-transparent border-neutral-700 text-white placeholder:text-neutral-600 focus:border-[#c9a962]"
+                    />
+                    <span className="text-neutral-500 text-sm">{unitLabel}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 区切り線 */}
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-px bg-neutral-800" />
+              </div>
+
+              {/* カラー選択 */}
+              <div className="flex items-center gap-4">
+                <span className="text-neutral-400 text-sm tracking-widest uppercase w-20">
+                  {t.color.title}
                 </span>
-              </button>
-            ))}
-          </div>
-          <div className="text-center mt-8">
-            <Button
-              variant="outline"
-              onClick={() => router.push('/categories')}
-            >
-              {t.common.showMore}
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+                <Select
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="flex-1 bg-transparent border-neutral-700 text-white focus:border-[#c9a962]"
+                >
+                  {COLORS.map((c) => (
+                    <option key={c.slug} value={c.slug} className="bg-[#141414]">
+                      {isJa ? c.nameJa : c.nameEn}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* 区切り線 */}
+              <div className="flex items-center gap-4">
+                <div className="flex-1 h-px bg-neutral-800" />
+              </div>
+
+              {/* カテゴリ選択 */}
+              <div className="flex items-center gap-4">
+                <span className="text-neutral-400 text-sm tracking-widest uppercase w-20">
+                  {t.category.title}
+                </span>
+                <Select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="flex-1 bg-transparent border-neutral-700 text-white focus:border-[#c9a962]"
+                >
+                  {CATEGORIES.map((cat) => (
+                    <option key={cat.slug} value={cat.slug} className="bg-[#141414]">
+                      {isJa ? cat.nameJa : cat.nameEn}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+
+              {/* 検索ボタン */}
+              <div className="pt-4">
+                <button
+                  onClick={handleSearch}
+                  className="w-full py-4 bg-[#c9a962] hover:bg-[#d4b876] text-[#0c0c0c] text-sm tracking-[0.2em] uppercase font-medium transition-colors flex items-center justify-center gap-3"
+                >
+                  {t.search.searchButton}
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 特徴セクション */}
-      <section className="py-16 bg-slate-50">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                <Ruler className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                {language === 'ja' ? 'サイズで検索' : 'Search by Size'}
-              </h3>
-              <p className="text-slate-600">
-                {language === 'ja'
-                  ? '幅・奥行き・高さを指定して、ぴったりの家具を見つけられます'
-                  : 'Find furniture that fits perfectly by specifying dimensions'}
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-                <span className="text-2xl">🌲</span>
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                {language === 'ja' ? '木材で絞り込み' : 'Filter by Wood Type'}
-              </h3>
-              <p className="text-slate-600">
-                {language === 'ja'
-                  ? 'ウォールナット、オークなど木材の種類で絞り込めます'
-                  : 'Filter by walnut, oak, and other wood types'}
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
-                <span className="text-2xl">🌍</span>
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                {language === 'ja' ? '複数のショップを比較' : 'Compare Multiple Shops'}
-              </h3>
-              <p className="text-slate-600">
-                {language === 'ja'
-                  ? 'Amazon、楽天など複数のECサイトから商品を探せます'
-                  : 'Browse products from Amazon, Wayfair and more'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

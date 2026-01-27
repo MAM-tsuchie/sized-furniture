@@ -1,51 +1,35 @@
 'use client';
 
 import Link from 'next/link';
-import { Ruler, Globe } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import { Select } from '@/components/ui/select';
-import { useTranslation } from '@/lib/i18n/context';
 import { useRegion } from '@/lib/region/context';
 import type { RegionCode } from '@/types';
 
 export function Header() {
-  const { t } = useTranslation();
   const { regionCode, setRegionCode, availableRegions } = useRegion();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="container mx-auto px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-neutral-800 bg-black/90 backdrop-blur-md">
+      <div className="container mx-auto px-6">
         <div className="flex h-16 items-center justify-between">
           {/* ロゴ */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Ruler className="h-6 w-6 text-blue-600" />
-            <span className="font-bold text-xl text-slate-900">
-              {t.common.siteName}
+          <Link href="/" className="flex items-center space-x-3 group">
+            <span className="text-[#c9a962] text-2xl font-light tracking-[0.2em] uppercase">
+              Sized
+            </span>
+            <span className="text-neutral-400 text-sm tracking-widest uppercase">
+              Furniture
             </span>
           </Link>
 
-          {/* ナビゲーション */}
-          <nav className="hidden md:flex items-center space-x-6">
-            <Link
-              href="/search"
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              {t.common.search}
-            </Link>
-            <Link
-              href="/categories"
-              className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              {t.category.title}
-            </Link>
-          </nav>
-
           {/* 地域選択 */}
-          <div className="flex items-center space-x-2">
-            <Globe className="h-4 w-4 text-slate-400" />
+          <div className="flex items-center space-x-3">
+            <Globe className="h-4 w-4 text-neutral-500" />
             <Select
               value={regionCode}
               onChange={(e) => setRegionCode(e.target.value as RegionCode)}
-              className="w-32 h-9 text-sm"
+              className="w-32 h-9 text-sm bg-transparent border-neutral-700 text-neutral-300 focus:border-[#c9a962]"
             >
               {availableRegions.map((region) => (
                 <option key={region.code} value={region.code}>
