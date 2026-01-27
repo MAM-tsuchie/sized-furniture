@@ -148,9 +148,6 @@ const nextConfig: NextConfig = {
   // React Strict Mode
   reactStrictMode: true,
 
-  // 出力設定
-  output: 'standalone',
-
   // 環境変数
   env: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || 'https://sized-furniture.com',
