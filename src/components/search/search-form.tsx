@@ -8,7 +8,7 @@ import { SizeInput } from './size-input';
 import { useTranslation } from '@/lib/i18n/context';
 import { useRegion } from '@/lib/region/context';
 import { cn } from '@/lib/utils/cn';
-import type { ProductSearchParams, Category, ColorGroup, WoodType, Language } from '@/types';
+import type { ProductSearchParams, Category, ColorGroup, WoodType } from '@/types';
 
 interface SearchFormProps {
   categories: Category[];

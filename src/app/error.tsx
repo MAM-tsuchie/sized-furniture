@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -31,12 +32,12 @@ export default function Error({ error, reset }: ErrorProps) {
         >
           再試行
         </button>
-        <a
+        <Link
           href="/"
           className="inline-flex items-center justify-center px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
         >
           ホームに戻る
-        </a>
+        </Link>
       </div>
       {process.env.NODE_ENV === 'development' && (
         <div className="mt-8 p-4 bg-red-50 rounded-lg max-w-xl">

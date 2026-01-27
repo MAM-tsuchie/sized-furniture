@@ -21,7 +21,7 @@ interface SearchResponse {
 function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { t, language } = useTranslation();
+  const { t } = useTranslation();
   const { regionCode } = useRegion();
 
   const [products, setProducts] = useState<Product[]>([]);

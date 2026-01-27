@@ -10,7 +10,6 @@ import { RelatedProducts } from '@/components/product/related-products';
 import { useTranslation } from '@/lib/i18n/context';
 import { useRegion } from '@/lib/region/context';
 import { formatPrice } from '@/lib/utils/currency';
-import { formatProductSize } from '@/lib/utils/size';
 import type { Product } from '@/types';
 
 // モックデータ（実際はAPIから取得）
@@ -64,7 +63,7 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   const productId = params.id as string;
 
@@ -134,7 +133,6 @@ export default function ProductDetailPage() {
   }
 
   const images = product.imageUrls.length > 0 ? product.imageUrls : [product.imageUrl];
-  const displaySize = formatProductSize(product.widthCm, product.depthCm, product.heightCm, sizeUnit);
   const displayPrice = product.price ? formatPrice(product.price, currency) : '-';
 
   return (

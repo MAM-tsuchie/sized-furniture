@@ -5,8 +5,7 @@ import type {
   WoodType, 
   Product, 
   ProductSearchParams,
-  ProductSearchResult,
-  RegionCode 
+  ProductSearchResult 
 } from '@/types';
 
 /**

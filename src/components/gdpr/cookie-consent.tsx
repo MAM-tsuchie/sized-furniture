@@ -36,7 +36,10 @@ export function CookieConsent() {
     // すでに同意済みかチェック
     const consent = getCookie(CONSENT_COOKIE_NAME);
     if (!consent && isGdprRegion) {
-      setIsVisible(true);
+      // requestAnimationFrameを使って同期的なsetStateを回避
+      requestAnimationFrame(() => {
+        setIsVisible(true);
+      });
     }
   }, [isGdprRegion]);
 

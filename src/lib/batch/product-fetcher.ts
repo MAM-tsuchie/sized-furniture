@@ -1,8 +1,8 @@
 import { createServerSupabaseClient } from '@/lib/supabase/client';
 import { createAmazonClient, AmazonClient } from '@/lib/amazon/client';
-import { createRakutenClient, RakutenClient, RAKUTEN_FURNITURE_GENRES } from '@/lib/rakuten/client';
+import { createRakutenClient, RakutenClient } from '@/lib/rakuten/client';
 import { detectColorInfo } from '@/lib/colors/utils';
-import { parseSizeFromAmazonItem, parseSizeFromText, normalizeSizeToCm } from '@/lib/utils/size-parser';
+import { parseSizeFromAmazonItem } from '@/lib/utils/size-parser';
 import type { RegionCode, Product, ProductSource } from '@/types';
 
 interface FetcherConfig {
@@ -132,8 +132,8 @@ export class ProductFetcher {
       dimensions: item.dimensions,
     });
 
-    // カラーを検出
-    const colorInfo = detectColorInfo(item.color || item.title);
+    // カラーを検出（将来の拡張のためにcolorInfoを使用可能）
+    detectColorInfo(item.color || item.title);
 
     return {
       externalId: item.asin,

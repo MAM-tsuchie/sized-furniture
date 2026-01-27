@@ -24,7 +24,7 @@ export function RelatedProducts({
   widthCm,
   limit = 4,
 }: RelatedProductsProps) {
-  const { t, language } = useTranslation();
+  const { language } = useTranslation();
   const { regionCode, currency, sizeUnit } = useRegion();
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);

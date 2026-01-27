@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,9 @@ import { woodColorGroups, solidColorGroups } from '@/lib/colors/data';
 
 // 使用する背景画像のリスト
 const BG_IMAGES = [2, 3, 4];
+
+// 初期背景画像をランダムに選択（モジュールロード時に決定）
+const getInitialBgImage = () => BG_IMAGES[Math.floor(Math.random() * BG_IMAGES.length)];
 
 // カテゴリデータ
 const CATEGORIES = [
@@ -48,13 +51,9 @@ export default function HomePage() {
   const [heightMax, setHeightMax] = useState<string>('');
   const [color, setColor] = useState<string>('');
   const [category, setCategory] = useState<string>('desks');
-  const [bgImage, setBgImage] = useState<number>(2);
 
-  // 背景画像をランダムで選択（初回のみ）
-  useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * BG_IMAGES.length);
-    setBgImage(BG_IMAGES[randomIndex]);
-  }, []);
+  // 背景画像をランダムで選択（初回マウント時に固定）
+  const [bgImage] = useState(getInitialBgImage);
 
   const handleSearch = () => {
     const params = new URLSearchParams();

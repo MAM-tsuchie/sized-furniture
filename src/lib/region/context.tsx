@@ -1,8 +1,8 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import type { RegionCode, Region, SizeUnit, Currency } from '@/types';
-import { detectBrowserRegion, REGION_TO_LANGUAGE } from './detect';
+import { detectBrowserRegion } from './detect';
 
 // 地域データ（DB から取得するまでの仮データ）
 const REGIONS: Record<RegionCode, Region> = {

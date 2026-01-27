@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
 import type { Language } from '@/types';
-import { translations, getTranslations, interpolate, type TranslationData } from './translations';
+import { getTranslations, interpolate, type TranslationData } from './translations';
 
 interface I18nContextValue {
   language: Language;
