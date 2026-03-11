@@ -65,7 +65,7 @@ export default function AboutPage() {
         <ul>
           <li><strong>Size Search</strong>: Specify width, depth, and height to find the perfect furniture</li>
           <li><strong>Filter by Wood Type</strong>: Filter by walnut, oak, and other wood types</li>
-          <li><strong>Compare Multiple Shops</strong>: Browse products from Amazon, Wayfair, and more</li>
+          <li><strong>Compare Multiple Shops</strong>: Browse products from Amazon, Rakuten, and more</li>
         </ul>
         
         <h2>About Our Operation</h2>

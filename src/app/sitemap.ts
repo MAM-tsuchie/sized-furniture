@@ -1,28 +1,11 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
+import { createServerSupabaseClient } from '@/lib/supabase/client';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://sized-furniture.com';
 
-// カテゴリスラッグ（実際はDBから取得）
-const CATEGORY_SLUGS = [
-  'desks-tables',
-  'desks',
-  'dining-tables',
-  'chairs-seating',
-  'office-chairs',
-  'dining-chairs',
-  'storage',
-  'bookcases-shelves',
-  'tv-stands',
-  'beds-bedding',
-  'bed-frames',
-  'sofas-living',
-  'sofas',
-];
-
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  // 静的ページ
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: BASE_URL,
@@ -68,13 +51,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  // カテゴリページ
-  const categoryPages: MetadataRoute.Sitemap = CATEGORY_SLUGS.map((slug) => ({
-    url: `${BASE_URL}/category/${slug}`,
-    lastModified: now,
-    changeFrequency: 'daily' as const,
-    priority: 0.7,
-  }));
+  let categoryPages: MetadataRoute.Sitemap = [];
+  try {
+    const supabase = createServerSupabaseClient();
+    const { data: categories } = await supabase
+      .from('categories')
+      .select('slug')
+      .order('level', { ascending: true })
+      .order('sort_order', { ascending: true });
+
+    if (categories) {
+      categoryPages = categories.map((cat) => ({
+        url: `${BASE_URL}/category/${cat.slug}`,
+        lastModified: now,
+        changeFrequency: 'daily' as const,
+        priority: 0.7,
+      }));
+    }
+  } catch (error) {
+    console.error('Failed to fetch categories for sitemap:', error);
+  }
 
   return [...staticPages, ...categoryPages];
 }

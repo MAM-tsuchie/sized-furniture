@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { reportError } from '@/lib/monitoring/sentry';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -10,8 +11,7 @@ interface ErrorProps {
 
 export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
-    // エラーをログ送信（本番環境では Sentry 等に送信）
-    console.error('Application error:', error);
+    reportError(error, { digest: error.digest });
   }, [error]);
 
   return (

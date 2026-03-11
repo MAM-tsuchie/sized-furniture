@@ -8,6 +8,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { Select } from '@/components/ui/select';
 import { useTranslation } from '@/lib/i18n/context';
 import { useRegion } from '@/lib/region/context';
+import { trackSearch } from '@/components/analytics/google-analytics';
 import type { ProductSearchParams, Product, Category, ColorGroup, WoodType } from '@/types';
 
 interface SearchResponse {
@@ -108,6 +109,19 @@ function SearchContent() {
         setTotalCount(data.total);
         setCurrentPage(data.page);
         setTotalPages(data.totalPages);
+
+        trackSearch({
+          category: params.categoryId,
+          widthMin: params.widthMin,
+          widthMax: params.widthMax,
+          depthMin: params.depthMin,
+          depthMax: params.depthMax,
+          heightMin: params.heightMin,
+          heightMax: params.heightMax,
+          colorGroup: params.colorGroupId,
+          woodType: params.woodTypeId,
+          resultsCount: data.total,
+        });
       } else {
         setProducts([]);
         setTotalCount(0);

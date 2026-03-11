@@ -10,49 +10,8 @@ import { RelatedProducts } from '@/components/product/related-products';
 import { useTranslation } from '@/lib/i18n/context';
 import { useRegion } from '@/lib/region/context';
 import { formatPrice } from '@/lib/utils/currency';
+import { trackAffiliateClick } from '@/components/analytics/google-analytics';
 import type { Product } from '@/types';
-
-// モックデータ（実際はAPIから取得）
-const MOCK_PRODUCT: Product = {
-  id: '1',
-  externalId: 'B08XXXXX1',
-  source: 'amazon',
-  regionId: 'jp',
-  title: 'シンプルデスク オーク材 幅120cm 奥行60cm 高さ72cm 天然木 ワークデスク',
-  price: 29800,
-  originalCurrency: 'JPY',
-  priceLocal: 29800,
-  imageUrl: 'https://placehold.co/600x600/DEB887/333333?text=Oak+Desk',
-  imageUrls: [
-    'https://placehold.co/600x600/DEB887/333333?text=Front',
-    'https://placehold.co/600x600/DEB887/333333?text=Side',
-    'https://placehold.co/600x600/DEB887/333333?text=Detail',
-  ],
-  widthCm: 120,
-  depthCm: 60,
-  heightCm: 72,
-  weightKg: 25,
-  categoryId: 'desks',
-  colorGroupId: 'cg3',
-  woodTypeId: 'wt1',
-  colorName: 'オーク',
-  brand: 'EXAMPLE FURNITURE',
-  material: 'オーク無垢材、スチール脚',
-  features: [
-    '天然オーク材使用',
-    '広々とした作業スペース',
-    '安定感のあるスチール脚',
-    '組み立て簡単',
-    '耐荷重：50kg',
-  ],
-  affiliateUrl: 'https://amazon.co.jp/dp/B08XXXXX1',
-  originalUrl: 'https://amazon.co.jp/dp/B08XXXXX1',
-  isAvailable: true,
-  rawData: {},
-  fetchedAt: new Date(),
-  createdAt: new Date(),
-  updatedAt: new Date(),
-};
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -63,7 +22,7 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const productId = params.id as string;
 
@@ -76,22 +35,16 @@ export default function ProductDetailPage() {
         const response = await fetch(`/api/products/${productId}`);
         
         if (!response.ok) {
-          if (response.status === 404) {
-            setError('Product not found');
-          } else {
-            setError('Failed to load product');
-          }
-          // モックデータを使用（開発用）
-          setProduct(MOCK_PRODUCT);
+          setError(response.status === 404 ? 'not_found' : 'fetch_failed');
+          setProduct(null);
         } else {
           const data = await response.json();
           setProduct(data.product);
         }
       } catch (err) {
         console.error('Fetch product error:', err);
-        setError('Failed to load product');
-        // モックデータを使用（開発用）
-        setProduct(MOCK_PRODUCT);
+        setError('fetch_failed');
+        setProduct(null);
       } finally {
         setIsLoading(false);
       }
@@ -120,14 +73,29 @@ export default function ProductDetailPage() {
   }
 
   if (!product) {
+    const isNotFound = error === 'not_found';
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-2xl font-bold text-slate-900 mb-4">
-          {language === 'ja' ? '商品が見つかりません' : 'Product not found'}
+          {isNotFound
+            ? (language === 'ja' ? '商品が見つかりません' : 'Product not found')
+            : (language === 'ja' ? '商品情報の取得に失敗しました' : 'Failed to load product')}
         </h1>
-        <Button onClick={() => router.push('/search')}>
-          {language === 'ja' ? '検索に戻る' : 'Back to search'}
-        </Button>
+        <p className="text-slate-500 mb-6">
+          {isNotFound
+            ? (language === 'ja' ? 'この商品は削除されたか、URLが間違っている可能性があります。' : 'This product may have been removed or the URL may be incorrect.')
+            : (language === 'ja' ? 'しばらく経ってから再度お試しください。' : 'Please try again later.')}
+        </p>
+        <div className="flex gap-3 justify-center">
+          {!isNotFound && (
+            <Button variant="outline" onClick={() => window.location.reload()}>
+              {language === 'ja' ? '再読み込み' : 'Retry'}
+            </Button>
+          )}
+          <Button onClick={() => router.push('/search')}>
+            {language === 'ja' ? '検索に戻る' : 'Back to search'}
+          </Button>
+        </div>
       </div>
     );
   }
@@ -284,6 +252,7 @@ export default function ProductDetailPage() {
                 href={product.affiliateUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackAffiliateClick(product.id, product.source)}
                 className="flex items-center justify-center w-full h-12 px-6 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 {t.product.buyNow}

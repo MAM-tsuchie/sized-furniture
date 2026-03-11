@@ -1,6 +1,14 @@
 import type { Metadata } from 'next';
+import type { Language } from '@/types';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://sized-furniture.com';
+
+const LOCALE_MAP: Record<Language, string> = {
+  ja: 'ja_JP',
+  en: 'en_US',
+  de: 'de_DE',
+  fr: 'fr_FR',
+};
 
 interface GenerateMetadataOptions {
   title: string;
@@ -8,6 +16,7 @@ interface GenerateMetadataOptions {
   path?: string;
   ogImage?: string;
   noIndex?: boolean;
+  language?: Language;
 }
 
 /**
@@ -19,6 +28,7 @@ export function generatePageMetadata({
   path = '',
   ogImage,
   noIndex = false,
+  language = 'ja',
 }: GenerateMetadataOptions): Metadata {
   const url = `${BASE_URL}${path}`;
   const fullTitle = title.includes('Sized Furniture') ? title : `${title} | Sized Furniture`;
@@ -35,7 +45,7 @@ export function generatePageMetadata({
       url,
       siteName: 'Sized Furniture',
       type: 'website',
-      locale: 'ja_JP',
+      locale: LOCALE_MAP[language],
       images: ogImage ? [{ url: ogImage }] : undefined,
     },
     twitter: {

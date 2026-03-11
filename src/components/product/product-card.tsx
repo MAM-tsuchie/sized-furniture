@@ -9,6 +9,7 @@ import { useRegion } from '@/lib/region/context';
 import { formatPrice } from '@/lib/utils/currency';
 import { formatProductSize } from '@/lib/utils/size';
 import { cn } from '@/lib/utils/cn';
+import { trackProductClick, trackAffiliateClick } from '@/components/analytics/google-analytics';
 import type { Product } from '@/types';
 
 interface ProductCardProps {
@@ -100,6 +101,10 @@ export function ProductCard({
             href={affiliateUrl}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => {
+              trackProductClick(product.id, title, product.source);
+              trackAffiliateClick(product.id, product.source);
+            }}
             className="inline-flex items-center justify-center w-full h-10 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
           >
             {t.product.viewDetails}

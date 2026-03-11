@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { fetchAllProducts } from '@/lib/batch/product-fetcher';
 import type { RegionCode } from '@/types';
 
@@ -45,7 +45,6 @@ export async function POST(request: NextRequest) {
 
 // Vercel Cron設定用のGETエンドポイント
 export async function GET(request: NextRequest) {
-  // Vercel Cronからのリクエストを確認
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
 
@@ -56,11 +55,29 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // 日本の商品を取得
-  const result = await fetchAllProducts('jp');
+  const regionParam = request.nextUrl.searchParams.get('region');
+  const validRegions: RegionCode[] = ['jp', 'us', 'uk', 'de', 'fr', 'au', 'ca'];
+  const regionCode: RegionCode = validRegions.includes(regionParam as RegionCode)
+    ? (regionParam as RegionCode)
+    : 'jp';
 
-  return NextResponse.json({
-    success: true,
-    result,
-  });
+  try {
+    console.log(`[Cron] Starting product fetch for region: ${regionCode}`);
+
+    const result = await fetchAllProducts(regionCode);
+
+    console.log(`[Cron] Product fetch completed for ${regionCode}:`, result);
+
+    return NextResponse.json({
+      success: true,
+      region: regionCode,
+      result,
+    });
+  } catch (error) {
+    console.error(`[Cron] Batch fetch error for ${regionCode}:`, error);
+    return NextResponse.json(
+      { error: 'Batch processing failed', region: regionCode },
+      { status: 500 }
+    );
+  }
 }

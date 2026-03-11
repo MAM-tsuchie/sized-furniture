@@ -1,6 +1,6 @@
 import { createServerSupabaseClient } from '@/lib/supabase/client';
-import { createAmazonClient, AmazonClient } from '@/lib/amazon/client';
-import { createRakutenClient, RakutenClient } from '@/lib/rakuten/client';
+import { createAmazonClient, type AmazonClient } from '@/lib/amazon/client';
+import { createRakutenClient, type RakutenClient } from '@/lib/rakuten/client';
 import { detectColorInfo } from '@/lib/colors/utils';
 import { parseSizeFromAmazonItem } from '@/lib/utils/size-parser';
 import type { RegionCode, Product, ProductSource } from '@/types';
@@ -270,6 +270,90 @@ export class ProductFetcher {
   }
 }
 
+const CATEGORY_KEYWORDS: Record<string, Record<string, string[]>> = {
+  jp: {
+    desks: ['デスク', 'パソコンデスク', 'ワークデスク', '学習机'],
+    'dining-tables': ['ダイニングテーブル', '食卓'],
+    'side-tables': ['サイドテーブル', 'ナイトテーブル'],
+    'coffee-tables': ['ローテーブル', 'センターテーブル', 'リビングテーブル'],
+    'office-chairs': ['オフィスチェア', 'デスクチェア', 'ワークチェア'],
+    'dining-chairs': ['ダイニングチェア', '食卓椅子'],
+    'lounge-chairs': ['ラウンジチェア', 'リラックスチェア', 'パーソナルチェア'],
+    'bookcases-shelves': ['本棚', 'シェルフ', 'ラック'],
+    'tv-stands': ['テレビ台', 'TVボード', 'ローボード'],
+    cabinets: ['キャビネット', 'サイドボード', '食器棚'],
+    chests: ['チェスト', 'タンス', '引き出し収納'],
+    'bed-frames': ['ベッドフレーム', 'シングルベッド', 'ダブルベッド'],
+    mattresses: ['マットレス', 'シングルマットレス', 'ダブルマットレス'],
+    sofas: ['ソファ', '2人掛けソファ', '3人掛けソファ'],
+    'sofa-beds': ['ソファベッド', '折りたたみソファ'],
+  },
+  en: {
+    desks: ['desk', 'computer desk', 'writing desk', 'standing desk'],
+    'dining-tables': ['dining table', 'kitchen table'],
+    'side-tables': ['side table', 'end table', 'nightstand'],
+    'coffee-tables': ['coffee table', 'center table'],
+    'office-chairs': ['office chair', 'desk chair', 'ergonomic chair'],
+    'dining-chairs': ['dining chair', 'kitchen chair'],
+    'lounge-chairs': ['lounge chair', 'accent chair', 'armchair'],
+    'bookcases-shelves': ['bookcase', 'bookshelf', 'shelving unit'],
+    'tv-stands': ['TV stand', 'TV console', 'media console'],
+    cabinets: ['cabinet', 'sideboard', 'buffet cabinet'],
+    chests: ['chest of drawers', 'dresser', 'drawer chest'],
+    'bed-frames': ['bed frame', 'platform bed', 'bed'],
+    mattresses: ['mattress', 'memory foam mattress'],
+    sofas: ['sofa', 'couch', 'loveseat', 'sectional sofa'],
+    'sofa-beds': ['sofa bed', 'sleeper sofa', 'futon'],
+  },
+  de: {
+    desks: ['Schreibtisch', 'Computertisch', 'Bürotisch'],
+    'dining-tables': ['Esstisch', 'Küchentisch'],
+    'side-tables': ['Beistelltisch', 'Nachttisch'],
+    'coffee-tables': ['Couchtisch', 'Wohnzimmertisch'],
+    'office-chairs': ['Bürostuhl', 'Schreibtischstuhl', 'Drehstuhl'],
+    'dining-chairs': ['Esszimmerstuhl', 'Küchenstuhl'],
+    'lounge-chairs': ['Lounge Sessel', 'Relaxsessel', 'Sessel'],
+    'bookcases-shelves': ['Bücherregal', 'Regal', 'Standregal'],
+    'tv-stands': ['TV-Schrank', 'Lowboard', 'Fernsehtisch'],
+    cabinets: ['Schrank', 'Sideboard', 'Kommode'],
+    chests: ['Kommode', 'Schubladenkommode'],
+    'bed-frames': ['Bettgestell', 'Bett', 'Bettrahmen'],
+    mattresses: ['Matratze', 'Kaltschaummatratze'],
+    sofas: ['Sofa', 'Couch', 'Wohnlandschaft'],
+    'sofa-beds': ['Schlafsofa', 'Schlafcouch'],
+  },
+  fr: {
+    desks: ['bureau', 'bureau informatique', 'bureau debout'],
+    'dining-tables': ['table à manger', 'table de cuisine'],
+    'side-tables': ["table d'appoint", 'table de chevet'],
+    'coffee-tables': ['table basse', 'table de salon'],
+    'office-chairs': ['chaise de bureau', 'fauteuil de bureau'],
+    'dining-chairs': ['chaise de salle à manger', 'chaise de cuisine'],
+    'lounge-chairs': ['fauteuil', 'chaise longue'],
+    'bookcases-shelves': ['bibliothèque', 'étagère'],
+    'tv-stands': ['meuble TV', 'meuble télévision'],
+    cabinets: ['armoire', 'buffet', 'vaisselier'],
+    chests: ['commode', 'chiffonnier'],
+    'bed-frames': ['cadre de lit', 'lit', 'sommier'],
+    mattresses: ['matelas', 'matelas mousse'],
+    sofas: ['canapé', 'sofa', "canapé d'angle"],
+    'sofa-beds': ['canapé-lit', 'clic-clac', 'convertible'],
+  },
+};
+
+function getKeywordsForRegion(regionCode: RegionCode): Record<string, string[]> {
+  switch (regionCode) {
+    case 'jp':
+      return CATEGORY_KEYWORDS.jp;
+    case 'de':
+      return CATEGORY_KEYWORDS.de;
+    case 'fr':
+      return CATEGORY_KEYWORDS.fr;
+    default:
+      return CATEGORY_KEYWORDS.en;
+  }
+}
+
 /**
  * 全カテゴリの商品を取得
  */
@@ -282,17 +366,7 @@ export async function fetchAllProducts(regionCode: RegionCode): Promise<FetchRes
     errors: [],
   };
 
-  // カテゴリごとの検索キーワード
-  const categoryKeywords: Record<string, string[]> = {
-    'desks': ['デスク', 'パソコンデスク', 'ワークデスク', '学習机'],
-    'dining-tables': ['ダイニングテーブル', '食卓'],
-    'office-chairs': ['オフィスチェア', 'デスクチェア', 'ワークチェア'],
-    'dining-chairs': ['ダイニングチェア', '食卓椅子'],
-    'bookcases-shelves': ['本棚', 'シェルフ', 'ラック'],
-    'tv-stands': ['テレビ台', 'TVボード', 'ローボード'],
-    'bed-frames': ['ベッドフレーム', 'シングルベッド', 'ダブルベッド'],
-    'sofas': ['ソファ', '2人掛けソファ', '3人掛けソファ'],
-  };
+  const categoryKeywords = getKeywordsForRegion(regionCode);
 
   for (const [categorySlug, keywords] of Object.entries(categoryKeywords)) {
     const result = await fetcher.fetchByCategory(categorySlug, keywords);

@@ -92,6 +92,26 @@ function generateA8Link(
 }
 
 /**
+ * ShareASale 用リンク生成
+ */
+function generateShareASaleLink(
+  productUrl: string,
+  config: LinkGeneratorConfig
+): string {
+  return `https://www.shareasale.com/r.cfm?u=${config.affiliateId}&m=${config.programId}&urllink=${encodeURIComponent(productUrl)}`;
+}
+
+/**
+ * Impact 用リンク生成
+ */
+function generateImpactLink(
+  productUrl: string,
+  config: LinkGeneratorConfig
+): string {
+  return `https://goto.target.com/c/${config.affiliateId}/${config.programId}/2?u=${encodeURIComponent(productUrl)}`;
+}
+
+/**
  * アフィリエイトリンクを生成
  */
 export function generateAffiliateLink(
@@ -122,6 +142,12 @@ export function generateAffiliateLink(
       break;
     case 'a8':
       url = generateA8Link(productUrl, config);
+      break;
+    case 'shareasale':
+      url = generateShareASaleLink(productUrl, config);
+      break;
+    case 'impact':
+      url = generateImpactLink(productUrl, config);
       break;
     default:
       url = productUrl;

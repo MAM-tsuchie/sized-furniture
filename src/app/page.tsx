@@ -15,20 +15,22 @@ const BG_IMAGES = [2, 3, 4];
 // 初期背景画像をランダムに選択（モジュールロード時に決定）
 const getInitialBgImage = () => BG_IMAGES[Math.floor(Math.random() * BG_IMAGES.length)];
 
-// カテゴリデータ
 const CATEGORIES = [
   { slug: 'desks', nameJa: 'デスク', nameEn: 'Desk' },
   { slug: 'dining-tables', nameJa: 'ダイニングテーブル', nameEn: 'Dining Table' },
+  { slug: 'side-tables', nameJa: 'サイドテーブル', nameEn: 'Side Table' },
+  { slug: 'coffee-tables', nameJa: 'ローテーブル', nameEn: 'Coffee Table' },
   { slug: 'office-chairs', nameJa: 'オフィスチェア', nameEn: 'Office Chair' },
+  { slug: 'dining-chairs', nameJa: 'ダイニングチェア', nameEn: 'Dining Chair' },
+  { slug: 'lounge-chairs', nameJa: 'ラウンジチェア', nameEn: 'Lounge Chair' },
   { slug: 'bookcases-shelves', nameJa: '本棚・シェルフ', nameEn: 'Bookcase' },
   { slug: 'tv-stands', nameJa: 'テレビ台', nameEn: 'TV Stand' },
+  { slug: 'cabinets', nameJa: 'キャビネット', nameEn: 'Cabinet' },
+  { slug: 'chests', nameJa: 'チェスト', nameEn: 'Chest' },
   { slug: 'bed-frames', nameJa: 'ベッドフレーム', nameEn: 'Bed Frame' },
+  { slug: 'mattresses', nameJa: 'マットレス', nameEn: 'Mattress' },
   { slug: 'sofas', nameJa: 'ソファ', nameEn: 'Sofa' },
-  { slug: 'coffee-tables', nameJa: 'コーヒーテーブル', nameEn: 'Coffee Table' },
-  { slug: 'side-tables', nameJa: 'サイドテーブル', nameEn: 'Side Table' },
-  { slug: 'wardrobes', nameJa: 'ワードローブ', nameEn: 'Wardrobe' },
-  { slug: 'chest-drawers', nameJa: 'チェスト', nameEn: 'Chest of Drawers' },
-  { slug: 'shoe-racks', nameJa: 'シューズラック', nameEn: 'Shoe Rack' },
+  { slug: 'sofa-beds', nameJa: 'ソファベッド', nameEn: 'Sofa Bed' },
 ];
 
 // カラーデータを統合

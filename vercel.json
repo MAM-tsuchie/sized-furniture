@@ -20,6 +20,14 @@
     {
       "path": "/api/batch/fetch-products?region=fr",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/batch/fetch-products?region=au",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/batch/fetch-products?region=ca",
+      "schedule": "0 9 * * *"
     }
   ],
   "headers": [

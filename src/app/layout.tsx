@@ -46,8 +46,9 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // Google Search Console の認証コード（実際の値に置き換え）
-    // google: 'your-google-verification-code',
+    ...(process.env.GOOGLE_SITE_VERIFICATION && {
+      google: process.env.GOOGLE_SITE_VERIFICATION,
+    }),
   },
 };
 
