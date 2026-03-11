@@ -1,11 +1,18 @@
 'use client';
 
+import { useEffect } from 'react';
+import { reportError } from '@/lib/monitoring/sentry';
+
 interface GlobalErrorProps {
   error: Error & { digest?: string };
   reset: () => void;
 }
 
-export default function GlobalError({ error: _error, reset }: GlobalErrorProps) {
+export default function GlobalError({ error, reset }: GlobalErrorProps) {
+  useEffect(() => {
+    reportError(error, { digest: error.digest, global: true });
+  }, [error]);
+
   return (
     <html lang="ja">
       <body>
