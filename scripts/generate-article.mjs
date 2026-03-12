@@ -1,0 +1,157 @@
+#!/usr/bin/env node
+
+/**
+ * AI記事自動生成スクリプト
+ *
+ * 使い方:
+ *   OPENAI_API_KEY=sk-... node scripts/generate-article.mjs
+ *
+ * トピックリストから未執筆のテーマを1つ選び、
+ * OpenAI API で記事を生成して content/blog/ に保存する。
+ */
+
+import fs from 'node:fs';
+import path from 'node:path';
+import { topics } from './article-topics.mjs';
+
+const BLOG_DIR = path.join(process.cwd(), 'content', 'blog');
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+
+if (!OPENAI_API_KEY) {
+  console.error('Error: OPENAI_API_KEY is not set');
+  process.exit(1);
+}
+
+function getExistingSlugs() {
+  if (!fs.existsSync(BLOG_DIR)) {
+    fs.mkdirSync(BLOG_DIR, { recursive: true });
+    return new Set();
+  }
+  return new Set(
+    fs.readdirSync(BLOG_DIR)
+      .filter((f) => f.endsWith('.md'))
+      .map((f) => f.replace(/\.md$/, ''))
+  );
+}
+
+function pickNextTopic(existingSlugs) {
+  const unwritten = topics.filter((t) => !existingSlugs.has(t.slug));
+  if (unwritten.length === 0) return null;
+  // ランダムに1つ選ぶ（同じ順番だとカテゴリが偏るため）
+  return unwritten[Math.floor(Math.random() * unwritten.length)];
+}
+
+function buildSystemPrompt() {
+  return `あなたは日本語の家具・インテリア専門ライターです。
+SEOに強く、読者に実用的な情報を提供する記事を書いてください。
+
+## 記事のルール
+- Markdown形式で書く（frontmatterは不要、本文のみ）
+- H2（##）とH3（###）を使って構造化する
+- 表（テーブル）を積極的に使い、サイズの数値を具体的に示す
+- 「です・ます」調で書く
+- 1500〜3000文字程度
+- 冒頭に読者の悩みに共感する導入文を置く
+- 中盤にサイズの具体的な数値・比較表を含む
+- 末尾に「まとめ」セクションを置き、要点を箇条書きで整理する
+- 末尾の最後に「Sized Furnitureでは、幅・奥行き・高さを指定して家具を検索できます。」という一文を自然に含める
+- 画像やリンクは含めない
+- 広告的な表現は避け、客観的で信頼できるトーンを保つ
+- **で重要なポイントを強調する`;
+}
+
+function buildUserPrompt(topic) {
+  return `以下のテーマで記事を書いてください。
+
+タイトル: ${topic.title}
+ターゲットキーワード: ${topic.keywords}
+記事の方向性: ${topic.prompt}
+
+Markdown本文のみを出力してください（frontmatterは不要）。`;
+}
+
+async function callOpenAI(systemPrompt, userPrompt) {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${OPENAI_API_KEY}`,
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      temperature: 0.7,
+      max_tokens: 4096,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`OpenAI API error (${response.status}): ${error}`);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content.trim();
+}
+
+function buildFrontmatter(topic) {
+  const today = new Date().toISOString().slice(0, 10);
+  const tagsStr = topic.tags.map((t) => `"${t}"`).join(', ');
+
+  return `---
+title: "${topic.title}"
+description: "${topic.prompt.slice(0, 120).replace(/"/g, '\\"')}"
+date: "${today}"
+category: "${topic.category}"
+tags: [${tagsStr}]
+---`;
+}
+
+async function main() {
+  console.log('📝 記事生成を開始...');
+
+  const existingSlugs = getExistingSlugs();
+  console.log(`  既存記事数: ${existingSlugs.size}`);
+
+  const topic = pickNextTopic(existingSlugs);
+  if (!topic) {
+    console.log('✅ すべてのトピックが執筆済みです。新しいトピックを追加してください。');
+    process.exit(0);
+  }
+
+  console.log(`  選択されたトピック: ${topic.title} (${topic.slug})`);
+  console.log(`  カテゴリ: ${topic.category}`);
+
+  const systemPrompt = buildSystemPrompt();
+  const userPrompt = buildUserPrompt(topic);
+
+  console.log('  AI に記事を生成中...');
+  const content = await callOpenAI(systemPrompt, userPrompt);
+
+  const frontmatter = buildFrontmatter(topic);
+  const fullContent = `${frontmatter}\n\n${content}\n`;
+
+  const filePath = path.join(BLOG_DIR, `${topic.slug}.md`);
+  fs.writeFileSync(filePath, fullContent, 'utf-8');
+
+  console.log(`✅ 記事を保存しました: ${filePath}`);
+  console.log(`  タイトル: ${topic.title}`);
+  console.log(`  文字数: ${content.length}`);
+
+  // GitHub Actions のoutput用
+  const outputFile = process.env.GITHUB_OUTPUT;
+  if (outputFile) {
+    fs.appendFileSync(outputFile, `slug=${topic.slug}\n`);
+    fs.appendFileSync(outputFile, `title=${topic.title}\n`);
+    fs.appendFileSync(outputFile, `generated=true\n`);
+  }
+}
+
+main().catch((err) => {
+  console.error('❌ エラー:', err.message);
+  process.exit(1);
+});
