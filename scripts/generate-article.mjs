@@ -6,8 +6,14 @@
  * 使い方:
  *   OPENAI_API_KEY=sk-... node scripts/generate-article.mjs
  *
- * トピックリストから未執筆のテーマを1つ選び、
- * OpenAI API で記事を生成して content/blog/ に保存する。
+ * OpenAI / OpenRouter 両対応。キーの形式で自動判別:
+ *   - sk-or-... → OpenRouter (https://openrouter.ai/api/v1)
+ *   - sk-...    → OpenAI    (https://api.openai.com/v1)
+ *
+ * 環境変数:
+ *   OPENAI_API_KEY  — APIキー（必須）
+ *   OPENAI_MODEL    — モデル名（省略時は自動選択）
+ *   LLM_BASE_URL    — ベースURL（明示的に指定する場合）
  */
 
 import fs from 'node:fs';
@@ -15,13 +21,21 @@ import path from 'node:path';
 import { topics } from './article-topics.mjs';
 
 const BLOG_DIR = path.join(process.cwd(), 'content', 'blog');
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+const API_KEY = process.env.OPENAI_API_KEY;
 
-if (!OPENAI_API_KEY) {
+if (!API_KEY) {
   console.error('Error: OPENAI_API_KEY is not set');
   process.exit(1);
 }
+
+const isOpenRouter = API_KEY.startsWith('sk-or-');
+const BASE_URL = process.env.LLM_BASE_URL ||
+  (isOpenRouter ? 'https://openrouter.ai/api/v1' : 'https://api.openai.com/v1');
+const MODEL = process.env.OPENAI_MODEL ||
+  (isOpenRouter ? 'openai/gpt-4o-mini' : 'gpt-4o-mini');
+
+console.log(`  Provider: ${isOpenRouter ? 'OpenRouter' : 'OpenAI'}`);
+console.log(`  Model: ${MODEL}`);
 
 function getExistingSlugs() {
   if (!fs.existsSync(BLOG_DIR)) {
@@ -71,13 +85,20 @@ function buildUserPrompt(topic) {
 Markdown本文のみを出力してください（frontmatterは不要）。`;
 }
 
-async function callOpenAI(systemPrompt, userPrompt) {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+async function callLLM(systemPrompt, userPrompt) {
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${API_KEY}`,
+  };
+
+  if (isOpenRouter) {
+    headers['HTTP-Referer'] = 'https://sized-furniture.com';
+    headers['X-Title'] = 'Sized Furniture Blog Generator';
+  }
+
+  const response = await fetch(`${BASE_URL}/chat/completions`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${OPENAI_API_KEY}`,
-    },
+    headers,
     body: JSON.stringify({
       model: MODEL,
       messages: [
@@ -91,7 +112,7 @@ async function callOpenAI(systemPrompt, userPrompt) {
 
   if (!response.ok) {
     const error = await response.text();
-    throw new Error(`OpenAI API error (${response.status}): ${error}`);
+    throw new Error(`LLM API error (${response.status}): ${error}`);
   }
 
   const data = await response.json();
@@ -130,7 +151,7 @@ async function main() {
   const userPrompt = buildUserPrompt(topic);
 
   console.log('  AI に記事を生成中...');
-  const content = await callOpenAI(systemPrompt, userPrompt);
+  const content = await callLLM(systemPrompt, userPrompt);
 
   const frontmatter = buildFrontmatter(topic);
   const fullContent = `${frontmatter}\n\n${content}\n`;
