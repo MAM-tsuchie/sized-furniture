@@ -23,20 +23,43 @@ export function Header() {
             </span>
           </Link>
 
-          {/* 地域選択 */}
-          <div className="flex items-center space-x-3">
-            <Globe className="h-4 w-4 text-neutral-500" />
-            <Select
-              value={regionCode}
-              onChange={(e) => setRegionCode(e.target.value as RegionCode)}
-              className="w-32 h-9 text-sm bg-transparent border-neutral-700 text-neutral-300 focus:border-[#c9a962]"
-            >
-              {availableRegions.map((region) => (
-                <option key={region.code} value={region.code}>
-                  {region.nameLocal}
-                </option>
-              ))}
-            </Select>
+          {/* ナビゲーション + 地域選択 */}
+          <div className="flex items-center space-x-6">
+            <nav className="hidden sm:flex items-center space-x-5 text-sm">
+              <Link
+                href="/search"
+                className="text-neutral-400 hover:text-[#c9a962] transition-colors"
+              >
+                検索
+              </Link>
+              <Link
+                href="/categories"
+                className="text-neutral-400 hover:text-[#c9a962] transition-colors"
+              >
+                カテゴリ
+              </Link>
+              <Link
+                href="/blog"
+                className="text-neutral-400 hover:text-[#c9a962] transition-colors"
+              >
+                ガイド
+              </Link>
+            </nav>
+
+            <div className="flex items-center space-x-3">
+              <Globe className="h-4 w-4 text-neutral-500" />
+              <Select
+                value={regionCode}
+                onChange={(e) => setRegionCode(e.target.value as RegionCode)}
+                className="w-32 h-9 text-sm bg-transparent border-neutral-700 text-neutral-300 focus:border-[#c9a962]"
+              >
+                {availableRegions.map((region) => (
+                  <option key={region.code} value={region.code}>
+                    {region.nameLocal}
+                  </option>
+                ))}
+              </Select>
+            </div>
           </div>
         </div>
       </div>

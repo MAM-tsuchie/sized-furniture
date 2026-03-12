@@ -10,6 +10,10 @@ export function Footer() {
     <footer className="py-6">
       <div className="container mx-auto px-6">
         <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-neutral-600">
+          <Link href="/blog" className="hover:text-neutral-400 transition-colors">
+            ガイド
+          </Link>
+          <span className="text-neutral-800">·</span>
           <Link href="/about" className="hover:text-neutral-400 transition-colors">
             {t.footer.about}
           </Link>

@@ -12,7 +12,11 @@ import { useRegion } from '@/lib/region/context';
 import { formatPrice } from '@/lib/utils/currency';
 import { trackAffiliateClick } from '@/components/analytics/google-analytics';
 import { upscaleRakutenImageUrl } from '@/lib/rakuten/client';
+import { ProductJsonLd, BreadcrumbJsonLd } from '@/components/seo/json-ld';
+import { ShareButtons } from '@/components/social/share-buttons';
 import type { Product } from '@/types';
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://sized-furniture.com';
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -105,8 +109,19 @@ export default function ProductDetailPage() {
   const images = rawImages.map(url => upscaleRakutenImageUrl(url));
   const displayPrice = product.price ? formatPrice(product.price, currency) : '-';
 
+  const productUrl = `${BASE_URL}/product/${product.id}`;
+
   return (
     <div className="container mx-auto px-4 py-8">
+      <ProductJsonLd product={product} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: language === 'ja' ? 'ホーム' : 'Home', url: BASE_URL },
+          { name: language === 'ja' ? '検索' : 'Search', url: `${BASE_URL}/search` },
+          { name: product.title, url: productUrl },
+        ]}
+      />
+
       {/* パンくずリスト */}
       <nav className="flex items-center text-sm text-slate-500 mb-6">
         <button onClick={() => router.push('/')} className="hover:text-slate-700">
@@ -268,6 +283,19 @@ export default function ProductDetailPage() {
             <p className="text-xs text-slate-500 text-center">
               {t.product.affiliateNotice}
             </p>
+          </div>
+
+          {/* シェアボタン */}
+          <div className="pt-2 border-t border-slate-100">
+            <p className="text-sm text-slate-500 mb-2">
+              {language === 'ja' ? 'この商品をシェア' : 'Share this product'}
+            </p>
+            <ShareButtons
+              url={productUrl}
+              title={product.title}
+              description={`${product.title} - サイズで家具を検索 | Sized Furniture`}
+              imageUrl={product.imageUrl}
+            />
           </div>
         </div>
       </div>
