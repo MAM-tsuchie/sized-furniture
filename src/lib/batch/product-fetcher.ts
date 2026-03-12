@@ -8,6 +8,7 @@ import type { RegionCode, Product, ProductSource } from '@/types';
 interface FetcherConfig {
   regionCode: RegionCode;
   batchSize?: number;
+  maxExecutionMs?: number;
 }
 
 interface FetchResult {
@@ -15,6 +16,8 @@ interface FetchResult {
   failed: number;
   skipped: number;
   errors: string[];
+  timedOut?: boolean;
+  elapsedMs?: number;
 }
 
 /**
@@ -25,15 +28,27 @@ export class ProductFetcher {
   private amazonClient: AmazonClient | null;
   private rakutenClient: RakutenClient | null;
   private config: FetcherConfig;
+  private startTime: number;
+  private readonly maxExecutionMs: number;
 
   constructor(config: FetcherConfig) {
     this.config = {
       batchSize: 100,
       ...config,
     };
+    this.startTime = Date.now();
+    this.maxExecutionMs = config.maxExecutionMs ?? 250_000; // Vercel 300s制限に対し50s余裕を持つ
 
     this.amazonClient = createAmazonClient(config.regionCode);
     this.rakutenClient = config.regionCode === 'jp' ? createRakutenClient() : null;
+  }
+
+  get hasAnyClient(): boolean {
+    return this.amazonClient !== null || this.rakutenClient !== null;
+  }
+
+  isTimeBudgetExceeded(): boolean {
+    return Date.now() - this.startTime >= this.maxExecutionMs;
   }
 
   /**
@@ -75,6 +90,11 @@ export class ProductFetcher {
     }
 
     for (const keyword of keywords) {
+      if (this.isTimeBudgetExceeded()) {
+        result.errors.push(`Time budget exceeded, stopping at keyword: ${keyword}`);
+        break;
+      }
+
       // Amazonから取得
       if (this.amazonClient) {
         try {
@@ -355,9 +375,22 @@ function getKeywordsForRegion(regionCode: RegionCode): Record<string, string[]> 
 }
 
 /**
+ * カテゴリ配列を日付ベースでローテーションする。
+ * 毎日異なるカテゴリからスタートし、タイムアウト時に
+ * 特定カテゴリが永久にスキップされることを防ぐ。
+ */
+function rotateEntries<T>(entries: T[]): T[] {
+  if (entries.length <= 1) return entries;
+  const dayOfYear = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+  const offset = dayOfYear % entries.length;
+  return [...entries.slice(offset), ...entries.slice(0, offset)];
+}
+
+/**
  * 全カテゴリの商品を取得
  */
 export async function fetchAllProducts(regionCode: RegionCode): Promise<FetchResult> {
+  const startTime = Date.now();
   const fetcher = new ProductFetcher({ regionCode });
   const totalResult: FetchResult = {
     success: 0,
@@ -366,9 +399,26 @@ export async function fetchAllProducts(regionCode: RegionCode): Promise<FetchRes
     errors: [],
   };
 
-  const categoryKeywords = getKeywordsForRegion(regionCode);
+  if (!fetcher.hasAnyClient) {
+    console.warn(`[Cron] No API clients available for region: ${regionCode}, skipping fetch`);
+    totalResult.errors.push(`No API clients configured for region: ${regionCode}`);
+    totalResult.elapsedMs = Date.now() - startTime;
+    return totalResult;
+  }
 
-  for (const [categorySlug, keywords] of Object.entries(categoryKeywords)) {
+  const categoryKeywords = getKeywordsForRegion(regionCode);
+  const entries = rotateEntries(Object.entries(categoryKeywords));
+
+  console.log(`[Cron] Processing ${entries.length} categories, starting from: ${entries[0]?.[0]}`);
+
+  for (const [categorySlug, keywords] of entries) {
+    if (fetcher.isTimeBudgetExceeded()) {
+      console.warn(`[Cron] Time budget exceeded, stopping at category: ${categorySlug}`);
+      totalResult.timedOut = true;
+      totalResult.errors.push(`Time budget exceeded at category: ${categorySlug}`);
+      break;
+    }
+
     const result = await fetcher.fetchByCategory(categorySlug, keywords);
     totalResult.success += result.success;
     totalResult.failed += result.failed;
@@ -376,5 +426,6 @@ export async function fetchAllProducts(regionCode: RegionCode): Promise<FetchRes
     totalResult.errors.push(...result.errors);
   }
 
+  totalResult.elapsedMs = Date.now() - startTime;
   return totalResult;
 }
