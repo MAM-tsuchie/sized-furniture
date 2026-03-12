@@ -132,8 +132,8 @@ export class RakutenClient {
       price: item.itemPrice,
       originalCurrency: 'JPY',
       priceLocal: item.itemPrice,
-      imageUrl: item.mediumImageUrls[0]?.imageUrl || '',
-      imageUrls: item.mediumImageUrls.map(i => i.imageUrl),
+      imageUrl: upscaleRakutenImageUrl(item.mediumImageUrls[0]?.imageUrl || ''),
+      imageUrls: item.mediumImageUrls.map(i => upscaleRakutenImageUrl(i.imageUrl)),
       widthCm: sizeInfo.width,
       depthCm: sizeInfo.depth,
       heightCm: sizeInfo.height,
@@ -218,6 +218,14 @@ export function createRakutenClient(): RakutenClient | null {
   }
 
   return new RakutenClient({ applicationId, affiliateId });
+}
+
+/**
+ * 楽天サムネイルURLの解像度を上げる（128x128 → 500x500）
+ */
+export function upscaleRakutenImageUrl(url: string): string {
+  if (!url) return url;
+  return url.replace(/\?_ex=\d+x\d+/, '?_ex=500x500');
 }
 
 /**

@@ -10,6 +10,7 @@ import { formatPrice } from '@/lib/utils/currency';
 import { formatProductSize } from '@/lib/utils/size';
 import { cn } from '@/lib/utils/cn';
 import { trackProductClick, trackAffiliateClick } from '@/components/analytics/google-analytics';
+import { upscaleRakutenImageUrl } from '@/lib/rakuten/client';
 import type { Product } from '@/types';
 
 interface ProductCardProps {
@@ -39,18 +40,19 @@ export function ProductCard({
 
   const displayPrice = price ? formatPrice(price, currency) : '-';
   const displaySize = formatProductSize(widthCm, depthCm, heightCm, sizeUnit);
+  const highResImageUrl = imageUrl ? upscaleRakutenImageUrl(imageUrl) : null;
 
   return (
     <Card className={cn('overflow-hidden hover:shadow-md transition-shadow', className)}>
       {/* 商品画像 */}
       <div className="relative aspect-square bg-slate-100">
-        {imageUrl ? (
+        {highResImageUrl ? (
           <Image
-            src={imageUrl}
+            src={highResImageUrl}
             alt={title}
             fill
             className="object-contain p-4"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           />
         ) : (
           <div className="flex items-center justify-center h-full text-slate-400">

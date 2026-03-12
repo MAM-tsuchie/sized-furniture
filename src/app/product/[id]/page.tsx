@@ -11,6 +11,7 @@ import { useTranslation } from '@/lib/i18n/context';
 import { useRegion } from '@/lib/region/context';
 import { formatPrice } from '@/lib/utils/currency';
 import { trackAffiliateClick } from '@/components/analytics/google-analytics';
+import { upscaleRakutenImageUrl } from '@/lib/rakuten/client';
 import type { Product } from '@/types';
 
 export default function ProductDetailPage() {
@@ -100,7 +101,8 @@ export default function ProductDetailPage() {
     );
   }
 
-  const images = product.imageUrls.length > 0 ? product.imageUrls : [product.imageUrl];
+  const rawImages = product.imageUrls.length > 0 ? product.imageUrls : [product.imageUrl];
+  const images = rawImages.map(url => upscaleRakutenImageUrl(url));
   const displayPrice = product.price ? formatPrice(product.price, currency) : '-';
 
   return (
