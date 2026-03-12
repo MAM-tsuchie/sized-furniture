@@ -194,11 +194,11 @@ function SearchContent() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="animate-pulse">
-          <div className="h-8 bg-slate-200 rounded w-1/4 mb-6"></div>
-          <div className="h-64 bg-slate-200 rounded mb-8"></div>
+          <div className="h-8 bg-slate-700 rounded w-1/4 mb-6"></div>
+          <div className="h-64 bg-slate-800 rounded mb-8"></div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="h-64 bg-slate-200 rounded"></div>
+              <div key={i} className="h-64 bg-slate-800 rounded"></div>
             ))}
           </div>
         </div>
@@ -208,12 +208,12 @@ function SearchContent() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">
+      <h1 className="text-2xl font-bold text-gold mb-6">
         {t.search.title}
       </h1>
 
       {/* 検索フォーム */}
-      <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+      <div className="bg-white text-slate-900 rounded-lg border border-slate-200 p-6 mb-8">
         <SearchForm
           categories={categories}
           colorGroups={colorGroups}
@@ -225,15 +225,15 @@ function SearchContent() {
 
       {/* 検索結果ヘッダー */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <p className="text-slate-600">
+        <p className="text-gold-light">
           {t.search.resultsCount.replace('{count}', String(totalCount))}
         </p>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-600">{t.common.sort}:</span>
+          <span className="text-sm text-slate-400">{t.common.sort}:</span>
           <Select
             value={`${sortBy}-${sortOrder}`}
             onChange={(e) => handleSortChange(e.target.value)}
-            className="w-40"
+            className="w-40 bg-slate-800! text-slate-200! border-slate-600!"
           >
             <option value="relevance-desc">{t.sort.relevance}</option>
             <option value="price-asc">{t.sort.priceAsc}</option>
@@ -247,7 +247,7 @@ function SearchContent() {
       {isSearching ? (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          <span className="ml-3 text-slate-600">{t.common.loading}</span>
+          <span className="ml-3 text-slate-400">{t.common.loading}</span>
         </div>
       ) : (
         <>
