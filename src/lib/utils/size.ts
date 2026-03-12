@@ -52,16 +52,16 @@ export function formatSizeRange(
  * 商品サイズを表示用にフォーマット
  */
 export function formatProductSize(
-  width: number | null,
-  depth: number | null,
-  height: number | null,
+  width: number | null | undefined,
+  depth: number | null | undefined,
+  height: number | null | undefined,
   unit: SizeUnit = 'cm'
 ): string {
   const parts: string[] = [];
   
-  if (width !== null) parts.push(`W${width}`);
-  if (depth !== null) parts.push(`D${depth}`);
-  if (height !== null) parts.push(`H${height}`);
+  if (width != null) parts.push(`W${width}`);
+  if (depth != null) parts.push(`D${depth}`);
+  if (height != null) parts.push(`H${height}`);
   
   if (parts.length === 0) return 'サイズ不明';
   

@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/client';
-import type { ProductSearchParams, RegionCode } from '@/types';
+import { transformKeys } from '@/lib/utils/transform';
+import type { Product, ProductSearchParams, RegionCode } from '@/types';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -141,7 +142,7 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      products: products || [],
+      products: transformKeys<Product[]>(products || []),
       total: count || 0,
       page,
       limit,

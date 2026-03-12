@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/client';
+import { transformKeys } from '@/lib/utils/transform';
+import type { Product } from '@/types';
 
 export async function GET(
   request: NextRequest,
@@ -28,7 +30,7 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({ product });
+    return NextResponse.json({ product: transformKeys<Product>(product) });
   } catch (error) {
     console.error('Get product error:', error);
     return NextResponse.json(

@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/client';
+import { transformKeys } from '@/lib/utils/transform';
 
 export async function GET(request: NextRequest) {
   const supabase = createServerSupabaseClient();
@@ -56,9 +57,9 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({
-      colorTypes: colorTypes || [],
-      colorGroups: colorGroups || [],
-      woodTypes: woodTypes || [],
+      colorTypes: transformKeys(colorTypes || []),
+      colorGroups: transformKeys(colorGroups || []),
+      woodTypes: transformKeys(woodTypes || []),
     });
   } catch (error) {
     console.error('Get colors error:', error);

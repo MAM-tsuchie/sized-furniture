@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/client';
+import { transformKeys } from '@/lib/utils/transform';
 
 export async function GET(request: NextRequest) {
   const supabase = createServerSupabaseClient();
@@ -30,10 +31,10 @@ export async function GET(request: NextRequest) {
     // ツリー構造に変換
     if (includeTree && categories) {
       const tree = buildCategoryTree(categories);
-      return NextResponse.json({ categories: tree });
+      return NextResponse.json({ categories: transformKeys(tree) });
     }
 
-    return NextResponse.json({ categories: categories || [] });
+    return NextResponse.json({ categories: transformKeys(categories || []) });
   } catch (error) {
     console.error('Get categories error:', error);
     return NextResponse.json(
