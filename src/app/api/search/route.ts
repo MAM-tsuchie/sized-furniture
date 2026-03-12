@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     heightMin: searchParams.get('heightMin') ? Number(searchParams.get('heightMin')) : undefined,
     heightMax: searchParams.get('heightMax') ? Number(searchParams.get('heightMax')) : undefined,
     categoryId: searchParams.get('categoryId') || undefined,
+    categorySlug: searchParams.get('category') || undefined,
     colorGroupId: searchParams.get('colorGroupId') || undefined,
     woodTypeId: searchParams.get('woodTypeId') || undefined,
     regionCode: (searchParams.get('region') as RegionCode) || 'jp',
@@ -69,18 +70,30 @@ export async function GET(request: NextRequest) {
       query = query.lte('height_cm', params.heightMax);
     }
 
+    // slug → ID 解決
+    let categoryId = params.categoryId;
+    if (!categoryId && params.categorySlug) {
+      const slug = params.categorySlug;
+      const { data: cat } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('slug', slug)
+        .single();
+      if (cat) categoryId = cat.id;
+    }
+
     // カテゴリフィルタ（子孫も含む）
-    if (params.categoryId) {
+    if (categoryId) {
       const { data: descendants } = await supabase
         .from('category_paths')
         .select('descendant_id')
-        .eq('ancestor_id', params.categoryId);
+        .eq('ancestor_id', categoryId);
       
       if (descendants && descendants.length > 0) {
         const ids = descendants.map(d => d.descendant_id);
         query = query.in('category_id', ids);
       } else {
-        query = query.eq('category_id', params.categoryId);
+        query = query.eq('category_id', categoryId);
       }
     }
 

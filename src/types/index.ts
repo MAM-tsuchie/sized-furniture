@@ -129,6 +129,7 @@ export interface ProductSearchParams {
   heightMin?: number;
   heightMax?: number;
   categoryId?: string;
+  categorySlug?: string;
   colorGroupId?: string;
   woodTypeId?: string;
   regionCode?: RegionCode;

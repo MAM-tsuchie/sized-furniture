@@ -46,6 +46,7 @@ function SearchContent() {
     heightMin: searchParams.get('heightMin') ? Number(searchParams.get('heightMin')) : undefined,
     heightMax: searchParams.get('heightMax') ? Number(searchParams.get('heightMax')) : undefined,
     categoryId: searchParams.get('categoryId') || undefined,
+    categorySlug: searchParams.get('category') || searchParams.get('categorySlug') || undefined,
     colorGroupId: searchParams.get('colorGroupId') || undefined,
     woodTypeId: searchParams.get('woodTypeId') || undefined,
     page: searchParams.get('page') ? Number(searchParams.get('page')) : 1,
@@ -92,6 +93,7 @@ function SearchContent() {
     if (params.heightMin) urlParams.set('heightMin', String(params.heightMin));
     if (params.heightMax) urlParams.set('heightMax', String(params.heightMax));
     if (params.categoryId) urlParams.set('categoryId', params.categoryId);
+    if (!params.categoryId && params.categorySlug) urlParams.set('category', params.categorySlug);
     if (params.colorGroupId) urlParams.set('colorGroupId', params.colorGroupId);
     if (params.woodTypeId) urlParams.set('woodTypeId', params.woodTypeId);
     urlParams.set('region', regionCode);
