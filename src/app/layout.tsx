@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { CookieConsent } from '@/components/gdpr/cookie-consent';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+import { WebSiteJsonLd } from '@/components/seo/json-ld';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -28,11 +29,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'ja_JP',
     siteName: 'Sized Furniture',
+    images: [{ url: `${BASE_URL}/opengraph-image`, width: 1200, height: 630, alt: 'Sized Furniture - サイズで探す家具検索' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sized Furniture - サイズで探す家具検索',
     description: 'サイズで家具を検索できるサイト',
+    images: [`${BASE_URL}/opengraph-image`],
   },
   robots: {
     index: true,
@@ -59,6 +62,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
+      <head>
+        <WebSiteJsonLd />
+      </head>
       <body className={inter.className}>
         <GoogleAnalytics />
         <Providers>

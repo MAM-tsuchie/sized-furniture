@@ -34,8 +34,12 @@ function SearchContent() {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [sortBy, setSortBy] = useState<'relevance' | 'price' | 'newest'>('relevance');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortBy, setSortBy] = useState<'relevance' | 'price' | 'newest'>(
+    (searchParams.get('sortBy') as 'relevance' | 'price' | 'newest') || 'relevance'
+  );
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>(
+    (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc'
+  );
 
   // URLパラメータから初期値を取得
   const getInitialParams = useCallback((): Partial<ProductSearchParams> => ({
@@ -175,10 +179,16 @@ function SearchContent() {
     const [newSortBy, newSortOrder] = value.split('-') as ['relevance' | 'price' | 'newest', 'asc' | 'desc'];
     setSortBy(newSortBy);
     setSortOrder(newSortOrder);
+
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('sortBy', newSortBy);
+    urlParams.set('sortOrder', newSortOrder);
+    urlParams.delete('page');
+    router.push(`/search?${urlParams.toString()}`);
     
     const params = getInitialParams();
     executeSearch(params, 1);
-  }, [executeSearch, getInitialParams]);
+  }, [router, executeSearch, getInitialParams]);
 
   // 初回検索
   useEffect(() => {
