@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Clock, ChevronRight, Tag } from 'lucide-react';
 import { getAllPosts } from '@/lib/blog';
@@ -54,58 +53,43 @@ export default function BlogPage() {
               <article key={post.slug}>
                 <Link
                   href={`/blog/${post.slug}`}
-                  className="block group rounded-xl border border-neutral-800 overflow-hidden hover:border-[#c9a962]/40 transition-all duration-300 hover:bg-neutral-900/50"
+                  className="block group rounded-xl border border-neutral-800 p-6 hover:border-[#c9a962]/40 transition-all duration-300 hover:bg-neutral-900/50"
                 >
-                  <div className="flex flex-col sm:flex-row">
-                    {post.coverImage && (
-                      <div className="relative w-full sm:w-48 md:w-56 h-40 sm:h-auto shrink-0">
-                        <Image
-                          src={post.coverImage}
-                          alt={post.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 640px) 100vw, 224px"
-                        />
-                      </div>
-                    )}
-                    <div className="p-6 flex-1 min-w-0">
-                      <div className="flex items-center gap-3 text-xs text-neutral-500 mb-3">
-                        <span className="px-2 py-0.5 rounded-full bg-[#c9a962]/10 text-[#c9a962] font-medium">
-                          {post.category}
-                        </span>
-                        <time dateTime={post.date}>
-                          {new Date(post.date).toLocaleDateString('ja-JP', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                          })}
-                        </time>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {post.readingTime}分で読める
-                        </span>
-                      </div>
-                      <h2 className="text-xl font-semibold text-white group-hover:text-[#c9a962] transition-colors mb-2">
-                        {post.title}
-                      </h2>
-                      <p className="text-neutral-400 text-sm leading-relaxed mb-4">
-                        {post.description}
-                      </p>
-                      {post.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {post.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="inline-flex items-center gap-1 text-xs text-neutral-500 bg-neutral-800/50 px-2 py-0.5 rounded"
-                            >
-                              <Tag className="w-3 h-3" />
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                  <div className="flex items-center gap-3 text-xs text-neutral-500 mb-3">
+                    <span className="px-2 py-0.5 rounded-full bg-[#c9a962]/10 text-[#c9a962] font-medium">
+                      {post.category}
+                    </span>
+                    <time dateTime={post.date}>
+                      {new Date(post.date).toLocaleDateString('ja-JP', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </time>
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {post.readingTime}分で読める
+                    </span>
                   </div>
+                  <h2 className="text-xl font-semibold text-white group-hover:text-[#c9a962] transition-colors mb-2">
+                    {post.title}
+                  </h2>
+                  <p className="text-neutral-400 text-sm leading-relaxed mb-4">
+                    {post.description}
+                  </p>
+                  {post.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {post.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="inline-flex items-center gap-1 text-xs text-neutral-500 bg-neutral-800/50 px-2 py-0.5 rounded"
+                        >
+                          <Tag className="w-3 h-3" />
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </Link>
               </article>
             ))}

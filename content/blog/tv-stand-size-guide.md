@@ -4,7 +4,6 @@ description: "テレビ台のサイズ選びで迷ったら。テレビのイン
 date: "2026-03-08"
 category: "サイズガイド"
 tags: ["テレビ台", "ローボード", "リビング", "サイズ選び"]
-coverImage: "https://images.pexels.com/photos/7512034/pexels-photo-7512034.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
 ---
 
 テレビ台（テレビボード・ローボード）は、リビングの印象を大きく左右する家具です。テレビとのサイズバランスが悪いと、見た目が不格好になるだけでなく、安定性にも影響します。
@@ -28,8 +27,6 @@ coverImage: "https://images.pexels.com/photos/7512034/pexels-photo-7512034.jpeg?
 - 床に座って見る場合：テレビ台の高さ **30〜40cm**（ロータイプ）
 - ソファに座って見る場合：テレビ台の高さ **40〜50cm**（ミドルタイプ）
 - ダイニングチェアから見る場合：テレビ台の高さ **50〜60cm**（ハイタイプ）
-
-![テレビ台のイメージ](https://images.pexels.com/photos/5912193/pexels-photo-5912193.jpeg?auto=compress&cs=tinysrgb&h=650&w=940)
 
 ## テレビのインチ数別おすすめサイズ
 
@@ -116,8 +113,6 @@ coverImage: "https://images.pexels.com/photos/7512034/pexels-photo-7512034.jpeg?
 
 - 幅：80〜120cm（対角線方向）
 - 奥行き：40〜50cm
-
-![テレビ台のイメージ](https://images.pexels.com/photos/1444416/pexels-photo-1444416.jpeg?auto=compress&cs=tinysrgb&h=650&w=940)
 
 ## 壁掛けテレビの場合
 

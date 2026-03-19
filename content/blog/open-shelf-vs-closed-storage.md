@@ -4,14 +4,11 @@ description: "オープンラックと扉付き収納の比較ガイド。それ
 date: "2026-03-12"
 category: "選び方ガイド"
 tags: ["収納", "オープンラック", "比較"]
-coverImage: "https://images.pexels.com/photos/6580395/pexels-photo-6580395.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
 ---
 
 ## オープンラック vs 扉付き収納｜サイズと使い勝手で選ぶ
 
 最近、インテリアの選択肢として注目されているのが「オープンラック」と「扉付き収納」です。どちらも収納の役割を果たしますが、それぞれにメリットとデメリットが存在します。特に、スペースの使い方や見せる収納のスタイルによって選び方が異なるため、迷った方も多いのではないでしょうか。この記事では、オープンラックと扉付き収納のサイズや使い勝手を比較し、あなたに最適な収納スタイルを見つける手助けをします。
-
-![収納のイメージ](https://images.pexels.com/photos/3773984/pexels-photo-3773984.jpeg?auto=compress&cs=tinysrgb&h=650&w=940)
 
 ## オープンラックの特徴
 
@@ -63,8 +60,6 @@ coverImage: "https://images.pexels.com/photos/6580395/pexels-photo-6580395.jpeg?
 ### ホコリ対策
 
 オープンラックはホコリが溜まりやすく、定期的な掃除が必要です。収納物を透明なケースに入れることで、ホコリ対策が可能ですが、見せる収納の魅力が減少することもあります。対して、扉付き収納はホコリを防ぐことができるため、掃除の手間を軽減できます。
-
-![収納のイメージ](https://images.pexels.com/photos/7045947/pexels-photo-7045947.jpeg?auto=compress&cs=tinysrgb&h=650&w=940)
 
 ## 部屋の広さ別おすすめ
 
