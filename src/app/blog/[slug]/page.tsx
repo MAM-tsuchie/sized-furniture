@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronRight, Clock, Calendar, Tag } from 'lucide-react';
@@ -40,11 +41,15 @@ export async function generateMetadata({
       publishedTime: post.date,
       ...(post.updatedAt && { modifiedTime: post.updatedAt }),
       authors: ['Sized Furniture'],
+      ...(post.coverImage && {
+        images: [{ url: post.coverImage, width: 1200, height: 630, alt: post.title }],
+      }),
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description: post.description,
+      ...(post.coverImage && { images: [post.coverImage] }),
     },
   };
 }
@@ -53,7 +58,7 @@ function ArticleJsonLd({
   post,
   slug,
 }: {
-  post: { title: string; description: string; date: string; updatedAt?: string };
+  post: { title: string; description: string; date: string; updatedAt?: string; coverImage?: string };
   slug: string;
 }) {
   const jsonLd = {
@@ -63,6 +68,7 @@ function ArticleJsonLd({
     description: post.description,
     datePublished: post.date,
     ...(post.updatedAt && { dateModified: post.updatedAt }),
+    ...(post.coverImage && { image: post.coverImage }),
     author: { '@type': 'Organization', name: 'Sized Furniture' },
     publisher: {
       '@type': 'Organization',
@@ -149,6 +155,19 @@ export default async function BlogPostPage({
             </span>
           </div>
         </header>
+
+        {post.coverImage && (
+          <div className="relative w-full aspect-2/1 mb-10 rounded-xl overflow-hidden">
+            <Image
+              src={post.coverImage}
+              alt={post.title}
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 768px) 100vw, 768px"
+            />
+          </div>
+        )}
 
         <div className="w-full h-px bg-neutral-800 mb-10" />
 

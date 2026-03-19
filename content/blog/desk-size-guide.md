@@ -4,6 +4,7 @@ description: "デスクのサイズ選びで迷っていませんか？在宅ワ
 date: "2026-03-12"
 category: "サイズガイド"
 tags: ["デスク", "在宅ワーク", "サイズ選び", "ワークスペース"]
+coverImage: "https://images.pexels.com/photos/159839/office-home-house-desk-159839.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
 ---
 
 デスクは毎日使う家具だからこそ、サイズ選びは慎重に行いたいもの。「思ったより大きくて部屋が狭くなった」「小さすぎてモニターが置けない」といった失敗は、事前にサイズを把握しておくことで防げます。
@@ -19,6 +20,8 @@ tags: ["デスク", "在宅ワーク", "サイズ選び", "ワークスペース
 | **幅** | 作業スペースの広さ、モニター台数 |
 | **奥行き** | モニターとの距離、書類を広げるスペース |
 | **高さ** | 姿勢の快適さ、椅子との相性 |
+
+![デスクのイメージ](https://images.pexels.com/photos/6180729/pexels-photo-6180729.jpeg?auto=compress&cs=tinysrgb&h=650&w=940)
 
 ## 用途別おすすめサイズ
 
@@ -103,6 +106,8 @@ tags: ["デスク", "在宅ワーク", "サイズ選び", "ワークスペース
 - キーボード：約45×15cm
 - マウス + マウスパッド：約30×25cm
 - デスクライト：約15×15cm
+
+![デスクのイメージ](https://images.pexels.com/photos/1263558/pexels-photo-1263558.jpeg?auto=compress&cs=tinysrgb&h=650&w=940)
 
 ## よくある失敗パターン
 
