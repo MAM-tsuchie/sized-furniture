@@ -48,6 +48,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.nitori-net.jp',
       },
+      // Pexels (ブログ記事画像)
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+      },
       // プレースホルダー
       {
         protocol: 'https',
