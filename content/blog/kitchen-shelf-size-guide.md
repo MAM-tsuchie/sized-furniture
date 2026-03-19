@@ -4,6 +4,7 @@ description: "食器棚・キッチン収納のサイズガイド。一人暮ら
 date: "2026-03-12"
 category: "サイズガイド"
 tags: ["キッチン収納", "食器棚", "サイズ選び"]
+coverImage: "https://images.pexels.com/photos/4112622/pexels-photo-4112622.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
 ---
 
 ## キッチン収納・食器棚のサイズの選び方

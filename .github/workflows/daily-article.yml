@@ -41,6 +41,7 @@ jobs:
         run: node scripts/generate-article.mjs
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
 
       - name: Commit and push
         if: github.event.inputs.dry_run != 'true'
