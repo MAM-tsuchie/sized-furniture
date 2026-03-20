@@ -74,6 +74,12 @@ function ArticleJsonLd({
       '@type': 'Organization',
       name: 'Sized Furniture',
       url: BASE_URL,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${BASE_URL}/apple-icon`,
+        width: 180,
+        height: 180,
+      },
     },
     mainEntityOfPage: `${BASE_URL}/blog/${slug}`,
   };
