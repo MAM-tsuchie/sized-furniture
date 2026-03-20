@@ -64,8 +64,14 @@
   ],
   "redirects": [
     {
-      "source": "/furniture",
-      "destination": "/categories",
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.sized-furniture.com"
+        }
+      ],
+      "destination": "https://sized-furniture.com/:path*",
       "permanent": true
     }
   ],

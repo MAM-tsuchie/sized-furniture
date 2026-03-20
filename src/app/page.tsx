@@ -1,7 +1,16 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Clock, ArrowRight, Tag } from 'lucide-react';
 import { HeroSearch } from '@/components/home/hero-search';
 import { getAllPosts } from '@/lib/blog';
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://sized-furniture.com';
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: BASE_URL,
+  },
+};
 
 const LATEST_POSTS_COUNT = 3;
 
